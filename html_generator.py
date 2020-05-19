@@ -8,13 +8,13 @@ from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
 
 class TemplateCompiler:
-    def __init__(self, templates_dir, output_dir):
+    def __init__(self, templates_dir, output_dir,context={}):
         self.env = Environment(
             loader=FileSystemLoader(templates_dir),
             autoescape=select_autoescape(['html', 'xml'])
         )
         self.output_dir = output_dir
-        self.context = {}
+        self.context = context
 
     def get_html(self, file):
         template = self.env.get_template(file)
@@ -69,6 +69,10 @@ def startproject():
         
         click.confirm(f"Esta seguro que desea excluir los siguientes archivos? {exclude_files}",abort=True)
 
+    # Se obtienen variables de contexto
+    var_name = click.prompt("Ingrese el nombre de una variable de contexto que desee agregar",default="")
+    
+
     settings = {
         'input_dir':input_dir,'output_dir':output_dir,'exclude':exclude_files
     }
@@ -76,7 +80,6 @@ def startproject():
     
     with open(settings_filename,'w') as settings_file:
         json.dump(settings,settings_file)
-
 
 @cli.command()
 @click.option('-v', '--verbose', is_flag=True)
